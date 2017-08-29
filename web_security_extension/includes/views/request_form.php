@@ -20,10 +20,42 @@
 
 <?php
 
+global 
+$current_user;
+get_currentuserinfo();
+
+echo 'Username: ' . $current_user->user_login . '<br>';
+echo 'User email: ' . $current_user->user_email . '<br>';
+echo 'User level: ' . $current_user->user_level . '<br>';
+echo 'User first name: ' . $current_user->user_firstname . '<br>';
+echo 'User last name: ' . $current_user->user_lastname . '<br>';
+echo 'User display name: ' . $current_user->display_name . '<br>';
+echo 'User ID: ' . $current_user->ID . '<br>';
+
+$hash =  crc32($current_user->user_login);
+
+echo 'Hash: ' . $hash . '<br>'; 
+
+$cms_id = 
 $name = $_POST['name'];
 $company = $_POST['company'];
 $email = $_POST['email'];
 
-echo $name . ' ' . $company .  ' ' . $email;
+$url = 'http://localhost:8887/request_scan';
+$data = array('cms_id' => $user_id,'name' => $name, 'comapany' => $company, 'email' => $email);
+
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$result = curl_exec ($ch);
+
+curl_close ($ch);
+
+var_dump($result);
 
 ?>
