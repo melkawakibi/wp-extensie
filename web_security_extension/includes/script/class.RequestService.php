@@ -43,7 +43,7 @@ class RequestService
 
 	public function authenticate()
 	{
-		$user_data = ('cms_id' => $this->currentUser->getId(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
+		$user_data = array('cms_id' => $this->currentUser->getId(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
 
 		return $this->sendRequest($this->config['auth'], $user_data);
 	}

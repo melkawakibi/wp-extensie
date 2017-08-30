@@ -25,7 +25,7 @@ class CurrentUser
 		return $this->user_info->user_email;
 	}
 
-	public function registerDate()
+	public function getRegisterDate()
 	{
 		return $this->user_info->user_registered;
 	}

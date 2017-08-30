@@ -4,7 +4,9 @@ require_once(WSS_EXTESION_DIR . '/includes/script/class.RequestService.php');
 
 $request_service = new RequestService();
 
-if($request_service->authenticate()){
+$auth = json_decode($request_service->authenticate());
+
+if($auth->check){
 ?>
 	
 <html>
