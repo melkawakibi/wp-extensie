@@ -29,6 +29,8 @@ class RequestService
 
 		curl_close ($ch);
 
+		echo $result;
+
 		return $result;
 
 	}
@@ -38,7 +40,7 @@ class RequestService
 
 		$user_data = array('register_name' => $user['register_name'], 'register_company' => $user['register_company'], 'register_email' => $user['register_email'], 'cms_id' => $this->getHash(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
 
-		return $this->sendRequest($this->config['register'], $user_data);
+		echo $this->sendRequest($this->config['register'], $user_data);
 	}
 
 	public function authenticate()
@@ -50,7 +52,7 @@ class RequestService
 
 	public function scan($user)
 	{
-		$user_data = array('request_name' => $user['request_name'], 'request_company' => $user['request_company'], 'request_email' => $user['request_email'], 'type' => $user['type'], 'cms_id' => $user_id,'name' => $name, 'comapany' => $company, 'email' => $email);
+		$user_data = array('request_name' => $user['request_name'], 'request_company' => $user['request_company'], 'request_email' => $user['request_email'], 'type' => $user['type'], 'report' => $user['report'], 'cms_id' => $this->currentUser->getId(),'cms_name' => $this->currentUser->getUserName(), 'cms_url' => $this->currentUser->getUrl(), 'cms_email' => $this->currentUser->getEmail());
 
 		return $this->sendRequest($this->config['scan'], $user_data);
 	}
@@ -58,7 +60,13 @@ class RequestService
 	public function getHash()
 	{
 		$salt = substr(rand(), 0, 4);
-		$hash = $salt . md5($this->currentUser->getId().$this->currentUser->getUserName().$this->currentUser->getEmail().$this->currentUser->getUrl().$this->currentUser->getRegisterDate());
+
+		$hash = $salt . md5(
+	 	$this->currentUser->getId().
+	 	$this->currentUser->getUserName().
+	 	$this->currentUser->getEmail().
+	 	$this->currentUser->getUrl().
+	 	$this->currentUser->getRegisterDate());
 
 		return $hash;
 	}

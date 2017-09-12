@@ -7,6 +7,7 @@ class WebSecurity
 	{
 		add_action('admin_menu', array($this, 'ws_add_menu'));
 		add_action( 'admin_enqueue_scripts', array($this, 'ws_load_css') );
+		add_action('admin_enqueue_scripts', array($this, 'ws_load_js'));
 	}
 
 	function ws_add_menu()
@@ -30,6 +31,12 @@ class WebSecurity
 	{
  	    wp_register_style( 'ws_css', plugin_dir_url( __FILE__ ) . '/includes/resources/css/ws-style.css');
  	    wp_enqueue_style( 'ws_css' );
+	}
+
+	function ws_load_js()
+	{
+		wp_register_script('ws_js', plugin_dir_url( __FILE__ ) . '/includes/resources/js/script.js', array('jquery'), null, true);
+		wp_enqueue_script('ws_js');
 	}
 }
 
