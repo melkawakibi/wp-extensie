@@ -18,7 +18,8 @@ if($auth->state === 1 && $auth->active){
 				<select name="type">
 
 					<option value="full">full scan</option>
-					<option value="SQLi">SQL injection</option>
+					<option value="BlindSQL">Blind SQL injection</option>
+					<option value="SQL">SQL injection</option>
 					<option value="XSS">XSS</option>
 
 				</select>
