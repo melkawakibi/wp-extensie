@@ -3,6 +3,7 @@
 require_once(WSS_EXTESION_DIR . '/includes/script/class.RequestService.php');
 
 $request_service = new RequestService();
+$currentUser = new CurrentUser;
 
 $auth = json_decode($request_service->authenticate());
 
@@ -21,6 +22,7 @@ if($auth->state === 1 && $auth->active){
 					<option value="BlindSQL">Blind SQL injection</option>
 					<option value="SQL">SQL injection</option>
 					<option value="XSS">XSS</option>
+					<option value="Quickscan">Quick scan</option>
 
 				</select>
 
@@ -40,7 +42,7 @@ if($auth->state === 1 && $auth->active){
 					<input type="text" name="request_name">
 
 					<label>Email</label>
-					<input type="email" name="request_email">
+					<input type="email" name="alt_email">
 
 				</div>
 
@@ -56,18 +58,37 @@ if($auth->state === 1 && $auth->active){
 
 <html>
 	<body>
-		<h1>Aanvraag in behandeling</h1>
 		<div class="wrapper">
-			<p>Uw aanvraag is in behandeling. U ontvangt binnenkort een email met het resultaat van u aanvraag.</p>
 
-			<p>Waneer ben u geschikt om een aanvraag voor een scan te doen?</p>
+			<p> Bedankt voor het instaleren van SecurityReport Pandora </p>
+
+			<p>	Voer een snelle scan uit op uw website en zie of uw website kwetsbaarheden heeft.
+				Dit is een standaard account voor een Premium account kunt u contact opnemen met S5. </p>
+
+			<p>	Met de Premiumaccount kunt u meer uit Pandora halen.</p>
+				<p>Scan op meerdere kwetsbaarheden:</p>
+				<ul>
+					<li>SQLi</li>
+					<li>XSS</li>
+				</ul>
+
 			<ul>
-				<li>u bent klant bent bij S5.</li>
+				<li>Contactgegevens</li>
+				<li>[adres]</li>
+				<li>[telefoonnummer]</li>
 			</ul>
 
-			<p>Zodra u voldoet aan de bovenstaande criteria wordt uw account geactiveerd en kunt u beginnen met het aanvragen van Web Applicatie scans.</p>
+			<form action="<?php echo $_SERVER['PHP_SELF'] . '?page=Web_App_Scanner_menu' ?>" method="post">
+				
+				<input type="hidden" name="type" value="Quickscan">
+				<input type="hidden" name="report" value="short-report">
 
-			<p>Heeft u geen email ontvangen neem dan contact op met S5.</p>
+				<input type="submit" name="send" value="Snelle scan">
+
+			</form>
+			
+
+
 		</div>
 	</body>
 </html>
@@ -78,8 +99,12 @@ if($auth->state === 1 && $auth->active){
 
 <html>
 	<body>
-		<h1>Register</h1>
 		<div class="wrapper">
+
+			<h1>Register</h1>
+
+			<hr>
+					
 			<form action="<?php echo $_SERVER['PHP_SELF'] . '?page=Web_App_Scanner_menu' ?>" method="post">
 
 				<label>Naam</label>
@@ -88,10 +113,21 @@ if($auth->state === 1 && $auth->active){
 				<label>Bedrijf</label>
 				<input type="text" name="register_company">
 
-				<label>Email</label>
-				<input type="email" name="register_email">
+				<label>E-mail</label>
+				<select id="email" name="email">
+					<option value="<?php echo $currentUser->getEmail() ?>"><?php echo $currentUser->getEmail() ?></option>
+					<option value="alt-email">Alternatieve E-mail</option>
+				</select>
 
-				<input type="submit" name="register" value="registreer">		
+				<div class="email-wrapper">
+					<label>Alternatieve E-mail</label>
+					<input type="text" name="alt_email">
+				</div>
+
+				<label>token</label>
+				<input id="token" type="password" name="token">
+
+				<input type="submit" name="register" value="registreer">
 			</form>
 		</div>
 	</body>
@@ -104,11 +140,24 @@ if(!empty($_POST['register'])){
 
 	$name = $_POST['register_name'];
 	$company = $_POST['register_company'];
-	$email = $_POST['register_email'];
+	$email = '';
+	$token = '';
 
-	$user = array('register_name' => $name, 'register_company' => $company, 'register_email' => $email);
+	if(isset($_POST['alt_email'])){
+		$email = $_POST['alt_email'];
+	}
 
-	if(!empty($name) && !empty($company) && !empty($email)){
+	if(isset($_POST['token'])){
+		$token = md5(uniqid($_POST['token'], true));
+	}else{
+		$token = md5(generateRandomString(), true);
+	}
+
+	$user = array('register_name' => $name, 'register_company' => $company, 'alt_email' => $email, 'token' => $token);
+
+	if(!empty($name) && !empty($company)){
+
+		add_token($token);	
 
 		$request_service->register($user);
 
@@ -116,7 +165,7 @@ if(!empty($_POST['register'])){
 
 	}else{
 
-		echo 'Vul alle velden in';
+		echo '<h2> Naam en Bedrijf zijn verplichte velden </h2>';
 	
 	}
 }
@@ -125,7 +174,7 @@ if(!empty($_POST['send'])){
 
 	$name = $_POST['request_name'];
 	$company = $_POST['request_company'];
-	$email = $_POST['request_email'];
+	$email = $_POST['alt_email'];
 	$type = $_POST['type'];
 	$report_type = $_POST['report'];
 
@@ -135,5 +184,19 @@ if(!empty($_POST['send'])){
 
 }
 
+function add_token($token)
+{
+	add_option('token', $token);
+}
+
+function generateRandomString($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
 
 ?>

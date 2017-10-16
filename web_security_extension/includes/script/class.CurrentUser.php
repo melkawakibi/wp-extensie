@@ -35,4 +35,9 @@ class CurrentUser
 		return $this->user_info->user_url;
 	}
 
+	public function getToken()
+	{
+		return get_option('token');
+	}
+
 }

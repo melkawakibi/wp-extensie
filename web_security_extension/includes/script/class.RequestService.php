@@ -18,34 +18,28 @@ class RequestService
 	{
 
 		$ch = curl_init();
-
 		curl_setopt($ch, CURLOPT_URL, $route);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($user_data));
-
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+ 			
 		$result = curl_exec ($ch);
-
+	
 		curl_close ($ch);
 
-		echo $result;
-
 		return $result;
-
 	}
 
 	public function register($user)
 	{
+		$user_data = array('register_name' => $user['register_name'], 'register_company' => $user['register_company'], 'alt_email' => $user['alt_email'], 'token' => $user['token'], 'cms_id' => $this->getHash(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
 
-		$user_data = array('register_name' => $user['register_name'], 'register_company' => $user['register_company'], 'register_email' => $user['register_email'], 'cms_id' => $this->getHash(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
-
-		echo $this->sendRequest($this->config['register'], $user_data);
+		return $this->sendRequest($this->config['register'], $user_data);
 	}
 
 	public function authenticate()
 	{
-		$user_data = array('cms_id' => $this->currentUser->getId(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate());
+		$user_data = array('cms_id' => $this->currentUser->getId(), 'cms_username' => $this->currentUser->getUserName(), 'cms_email' => $this->currentUser->getEmail(), 'cms_url' => $this->currentUser->getUrl(), 'cms_register_date' => $this->currentUser->getRegisterDate(), 'token' => $this->currentUser->getToken());
 
 		return $this->sendRequest($this->config['auth'], $user_data);
 	}
@@ -66,7 +60,8 @@ class RequestService
 	 	$this->currentUser->getUserName().
 	 	$this->currentUser->getEmail().
 	 	$this->currentUser->getUrl().
-	 	$this->currentUser->getRegisterDate());
+	 	$this->currentUser->getRegisterDate().
+	 	$this->currentUser->getToken());
 
 		return $hash;
 	}
